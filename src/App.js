@@ -68,7 +68,7 @@ const App = () => {
       jsx = <RepoList repoList={repos}></RepoList>;
     }
     else if( (user !== "") && (!repos.length) ) {
-      jsx = <Segment textAlign='center'><Header.Subheader>No user found.</Header.Subheader></Segment>
+      jsx = <Segment textAlign='center'><Header.Subheader>No user or org found.</Header.Subheader></Segment>
     }
     else {
       jsx = <Segment textAlign='center'><Header.Subheader>Type a Github user or org name to begin.</Header.Subheader></Segment>
@@ -80,7 +80,7 @@ const App = () => {
 
   return(
       <Container style={{height:'100vh', paddingTop:'10vh'}}>
-        <Header textAlign='center' as='h2' content='Master to Main' subheader="Check if you a Github user or org has any public repositories with the default branch set as 'master'"/>
+        <Header textAlign='center' as='h2' content='Master to Main' subheader="Check if a Github user or org has any public repositories with the default branch set as 'master'"/>
         <Search
           size='big'
           input={{fluid:true}}
