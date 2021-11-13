@@ -59,9 +59,7 @@ const App = () => {
   const buildTableView = () => {
     var jsx = "";
 
-    // { repos.length ? <RepoList repoList={repos}></RepoList> : (user === '' ? null : <Header textAlign="center" style={{marginTop:'2rem'}}>No user found.</Header>)}
     if( searching ) {
-      console.log("searching..");
       jsx = <Segment textAlign='center'><Loader active inline centered>Searching...</Loader></Segment>
     }
     else if( (user !== "") && (repos.length) ) {
