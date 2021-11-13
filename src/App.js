@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {Container, Header, Search, Message} from 'semantic-ui-react';
+import {Container, Header, Search, Message, Loader, Segment} from 'semantic-ui-react';
 import axios from 'axios';
 import RepoList from './components/RepoList';
 
@@ -7,11 +7,13 @@ const App = () => {
 
   const [user, setUser] = useState("");
   const [repos, setRepos] = useState([]);
+  const [searching, setSearching] = useState(false)
 
   useEffect(() => {
     // If user is emtpy. Just set the repos list blank and return
     if( user === "" ) {
       setRepos([]);
+      setSearching(false);
       return;
     }
 
@@ -30,11 +32,13 @@ const App = () => {
           filteredRepos.push(i);
         })
 
+        setSearching(false);
         setRepos(filteredRepos);
       }
       catch(err) {
         // Error occured fetching repos. Clear the list.
         setRepos([]);
+        setSearching(false);
       }
     };
 
@@ -44,15 +48,39 @@ const App = () => {
       getRepos();
     }, 500);
 
+    setSearching(true);
+
     // At the next re-render, clear our timeout thus clearing the debounce.
     return () => {
       clearTimeout(timeout);
     }
   }, [user]);
 
+  const buildTableView = () => {
+    var jsx = "";
+
+    // { repos.length ? <RepoList repoList={repos}></RepoList> : (user === '' ? null : <Header textAlign="center" style={{marginTop:'2rem'}}>No user found.</Header>)}
+    if( searching ) {
+      console.log("searching..");
+      jsx = <Segment textAlign='center'><Loader active inline centered>Searching...</Loader></Segment>
+    }
+    else if( (user !== "") && (repos.length) ) {
+      jsx = <RepoList repoList={repos}></RepoList>;
+    }
+    else if( (user !== "") && (!repos.length) ) {
+      jsx = <Segment textAlign='center'><Header.Subheader>No user found.</Header.Subheader></Segment>
+    }
+    else {
+      jsx = <Segment textAlign='center'><Header.Subheader>Type a Github user or org name to begin.</Header.Subheader></Segment>
+    }
+
+
+    return jsx;
+  }
+
   return(
       <Container style={{height:'100vh', paddingTop:'10vh'}}>
-        <Header textAlign='center' as='h2' content='Master to Main' subheader="Check if you have any public Github repositories with the default branch set as 'master'"/>
+        <Header textAlign='center' as='h2' content='Master to Main' subheader="Check if you a Github user or org has any public repositories with the default branch set as 'master'"/>
         <Search
           size='big'
           input={{fluid:true}}
@@ -64,6 +92,9 @@ const App = () => {
           <Message.Header>Helpful links</Message.Header>
           <Message.List>
           <Message.Item>
+            <a href="https://betterprogramming.pub/github-replacing-master-with-main-is-a-huge-win-for-inclusion-in-tech-bf517478275b" target="_blank" rel="noreferrer">Inclusivity - The idea behind renaming your "master" branch</a>
+          </Message.Item>
+          <Message.Item>
             <a href="https://github.com/github/renaming#renaming-existing-branches" target="_blank" rel="noreferrer">Renaming existing branches on Github</a>
           </Message.Item>
           <Message.Item>
@@ -71,7 +102,7 @@ const App = () => {
           </Message.Item>
           </Message.List>
         </Message>
-        { repos.length ? <RepoList repoList={repos}></RepoList> : (user === '' ? null : <Header textAlign="center" style={{marginTop:'2rem'}}>No user found.</Header>)}
+        {buildTableView()}
       </Container>
   );
 }
