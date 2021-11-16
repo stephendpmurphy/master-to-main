@@ -8,7 +8,7 @@ const App = () => {
   const [user, setUser] = useState("");
   const [repos, setRepos] = useState([]);
   const [searching, setSearching] = useState(false);
-  const [filterForked, setFilterForked] = useState(false);
+  const [filterForked, setFilterForked] = useState(true);
   const [resultText, setResultText] = useState("");
 
   useEffect(() => {
