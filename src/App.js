@@ -9,12 +9,14 @@ const App = () => {
   const [repos, setRepos] = useState([]);
   const [searching, setSearching] = useState(false);
   const [filterForked, setFilterForked] = useState(false);
+  const [resultText, setResultText] = useState("");
 
   useEffect(() => {
     // If user is emtpy. Just set the repos list blank and return
     if( user === "" ) {
       setRepos([]);
       setSearching(false);
+      setResultText("Type a Github user or org name to begin.");
       return;
     }
 
@@ -45,11 +47,16 @@ const App = () => {
         // Clear our searching state and set the repos list state
         setSearching(false);
         setRepos(filteredRepos);
+
+        if( !filteredRepos.length ) {
+          setResultText("No repos found with a 'master' default branch  🎉");
+        }
       }
       catch(err) {
         // Error occured fetching repos. Clear the list.
         setRepos([]);
         setSearching(false);
+        setResultText("No user or org found with that name.");
       }
     };
 
@@ -76,11 +83,8 @@ const App = () => {
     else if( (user !== "") && (repos.length) ) {
       jsx = <RepoList repoList={repos}></RepoList>;
     }
-    else if( (user !== "") && (!repos.length) ) {
-      jsx = <Segment textAlign='center'><Header.Subheader>No user or org found.</Header.Subheader></Segment>
-    }
     else {
-      jsx = <Segment textAlign='center'><Header.Subheader>Type a Github user or org name to begin.</Header.Subheader></Segment>
+      jsx = <Segment textAlign='center'><Header.Subheader>{resultText}</Header.Subheader></Segment>
     }
 
     return jsx;
@@ -119,6 +123,7 @@ const App = () => {
             toggle
             label={{children:"Filter out Forked repos"}}
             onChange={(evt, data) => {setFilterForked(data.checked)}}
+            defaultChecked
           />
         </Container>
         {buildTableView()}
