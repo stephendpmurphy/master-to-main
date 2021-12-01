@@ -22,15 +22,31 @@ const App = () => {
 
     const getRepos = async() => {
       try {
-        // Retrieve the first page of repos
-        const {data} = await axios.get(`https://api.github.com/users/${user}/repos`);
+        var repoList = [];
+        // Loop through until the reponse header no longer has a "link" value. A link value would indicate
+        // there are more pages to retrieve
+        for(var i = 1; i <= 10; i++) {
+          // Retrieve the next page of repos
+          const response = await axios.get(`https://api.github.com/users/${user}/repos`, {
+            params: {
+              per_page: 100,
+              page: i
+            }
+          });
 
-        // If there are more, retreive the next page
+          // Concat the response data
+          repoList = repoList.concat(response.data);
 
+          // Check if the response we got has a 'link' param in the header.. If it does, we need to
+          // retrieve another page.. if no, then just break out by setting our iterator out of bounds
+          if(response.headers.link == null) {
+            i = 11;
+          }
+        }
         // Filter through and only grab repos with master as the default branch
         // and if it's NOT a fork.  (We only want to show repos that the user can do something about)
         var filteredRepos = [];
-        data.forEach((i) => {
+        repoList.forEach((i) => {
           // Check if the repo default branch is master
           if( (i.default_branch === 'master') ) {
             // iF we aren't filtering forks.. Then just add the repo to the list
